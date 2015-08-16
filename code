@@ -1,0 +1,77 @@
+/**
+ *  Automated Grow Light
+ *
+ *  Author: Chris Brueske
+ *
+ *	Last Updated: 8-16-2015
+ *
+ *	Based on "Light Up the Night" by Author: SmartThings
+ */
+
+definition(
+    name: "Automated Grow Light",
+    namespace: "chris-brueske",
+    author: "Chris Brueske",
+    description: "During a set time period every day, turn a grow light on and off based on a illuminance threshhold.",
+    category: "Convenience",
+    iconUrl: "https://s3.amazonaws.com/smartapp-icons/GreenLiving/Cat-GreenLiving.png",
+    iconX2Url: "https://s3.amazonaws.com/smartapp-icons/GreenLiving/Cat-GreenLiving@2x.png"
+)
+
+/** Need to gather info on what time period during a 24 hour day to make the app active, the illuminance sensor to use to measure light levels, what light to turn on, and what
+*	illuminance (measured in lux) threshold to set for turning the light on or off.
+*/
+
+
+preferences {
+    section("Monitor the illuminance...") {
+		input "lightSensor", "capability.illuminanceMeasurement"
+	}
+	section("Turn on a light...") {
+		input "lights", "capability.switch", multiple: true
+    }
+    section("Set illuminance threshold") {
+		input name: "illuminanceThreshold", title: "Lux?", type: "number", multiple: false
+	}
+	section("Only between these times...") {
+		input "time0", "time", title: "From what time?"
+		input "time1", "time", title: "Until what time?"
+    }
+}
+
+
+def installed() {
+	subscribe(lightSensor, "illuminance", illuminanceHandler)
+}
+
+def updated() {
+	unsubscribe()
+	subscribe(lightSensor, "illuminance", illuminanceHandler)
+}
+
+/** No need to use uninstall() because this app has no external data to clean-up.*/
+
+def illuminanceHandler(evt) {
+	def lastStatus = state.lastStatus
+    def currentDateTime = new Date()
+	log.debug "Time0 is ${time0}"
+	log.debug "Time1 is ${time1}"
+	log.debug "Current date and time is ${currentDateTime}"
+
+    if (lastStatus != "on" && evt.integerValue <= illuminanceThreshold && currentTime >= time0 && currentTime < time1) {
+		lights.on()
+		state.lastStatus = "on"
+	}
+	else if (lastStatus != "off" && evt.integerValue > illuminanceThreshold && currentTime >= time0 && currentTime < time1) {
+		lights.off()
+		state.lastStatus = "off"
+	}
+}
+
+
+/**
+ *  Scratch space below
+ *
+ *	Delete when finished
+ *
+ */

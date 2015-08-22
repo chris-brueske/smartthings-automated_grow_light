@@ -1,9 +1,9 @@
-/**
+**
  *  Automated Grow Light
  *
  *  Author: Chris Brueske
  *
- *	Last Updated: 8-16-2015
+ *	Last Updated: 8-22-2015
  *
  *	Based on "Light Up the Night" by Author: SmartThings
  */
@@ -18,8 +18,10 @@ definition(
     iconX2Url: "https://s3.amazonaws.com/smartapp-icons/GreenLiving/Cat-GreenLiving@2x.png"
 )
 
-/** Need to gather info on what time period during a 24 hour day to make the app active, the illuminance sensor to use to measure light levels, what light to turn on, and what
-*	illuminance (measured in lux) threshold to set for turning the light on or off.
+/** Preferences creates user input sections with labels and gathers info on what time period during
+*	a 24 hour day to make the app active, the illuminance sensor to use to measure light levels,
+*	what light to turn on, and what illuminance (measured in lux) threshold to set for turning the
+*	light on or off.
 */
 
 
@@ -39,6 +41,8 @@ preferences {
     }
 }
 
+/** Installed and subcribe the trigger that the app will watch for changes. In this case it is watching
+*	the light sensor for changes in light level, measureed in lux*/
 
 def installed() {
 	subscribe(lightSensor, "illuminance", illuminanceHandler)
@@ -51,12 +55,30 @@ def updated() {
 
 /** No need to use uninstall() because this app has no external data to clean-up.*/
 
+/** This section turns the light on or off based on the lights current state, the time of day,
+	and the light level, measured in lux*/
+
 def illuminanceHandler(evt) {
-	def lastStatus = state.lastStatus
+
+/** This defines the current state of the light. Either "on" or "off"*/
+
+    def lastStatus = state.lastStatus
+
+/** This defines the current time of the day. However it defines the whole date and time and
+	we need only the time portion.*/
+
     def currentDateTime = new Date()
-	log.debug "Time0 is ${time0}"
+
+/** Logging the current state of the time variables for debugging purposes. We need to get all
+	the time varibales into the same format so that we can compare them to the current time
+    of the day.*/
+
+    log.debug "Time0 is ${time0}"
 	log.debug "Time1 is ${time1}"
 	log.debug "Current date and time is ${currentDateTime}"
+
+/** This code does the comparisons of the current light level to the user defined light threshold and
+	and the current time of the day to the user defined start and end times.*/
 
     if (lastStatus != "on" && evt.integerValue <= illuminanceThreshold && currentTime >= time0 && currentTime < time1) {
 		lights.on()

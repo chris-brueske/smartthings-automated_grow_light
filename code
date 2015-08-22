@@ -67,11 +67,3 @@ def illuminanceHandler(evt) {
 		state.lastStatus = "off"
 	}
 }
-
-
-/**
- *  Scratch space below
- *
- *	Delete when finished
- *
- */

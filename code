@@ -67,7 +67,7 @@ def illuminanceHandler(evt) {
 /** This defines the current time of the day. However it defines the whole date and time and
 *   we need only the time portion.*/
 
-    def currentTime = now()
+    def currentTime = now()-today()
 
 /** Logging the current state of the time variables for debugging purposes. We need to get all
 *   the time variables into the same format so that we can compare them to the current time
@@ -75,7 +75,7 @@ def illuminanceHandler(evt) {
 
   log.debug "Time0 is ${time0}"
 	log.debug "Time1 is ${time1}"
-	log.debug "Current date and time is ${currentTime}"
+	log.debug "Current time is ${currentTime}"
 
 /** This code does the comparisons of the current light level to the user defined light threshold and
 	* and the current time of the day to the user defined start and end times. */
